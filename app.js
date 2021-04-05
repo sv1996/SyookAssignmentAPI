@@ -16,6 +16,31 @@ const itemSchema = {
   name: String,
   price: Number
 }
+const cutomerSchema = {
+  name: String,
+  city: String
+}
+
+
+const deliveryVehicleSchema = {
+registrationNumber: Number,
+vehicleType: Array,
+city: String,
+activeOrdersCount : { type: Number, min: 0, max: 2 }
+
+
+}
+
+const orderSchema = {
+orderNumber: String,
+itemId: String,
+price: String,
+cutomerId : String,
+deliveryVehicleId : String,
+isDelivered:{type:Boolean}
+}
+
+
 
 const Item = mongoose.model("Item" ,  itemSchema);
 //const car = new Item;
@@ -52,7 +77,7 @@ app.post("/items"  , function(req ,res){
 });
 
 
-app.detele("/items" , function (req , res){
+app.delete("/items" , function (req , res){
 Item.deleteMany(function (err){
 if(!err)
 {
@@ -64,7 +89,53 @@ if(!err)
  }
 
 });
+});
+//request for a specific Vehicles
+/// localhost:3000/items/alto
 
+app.route("/items/:vehicleTitle")
+
+.get(function(req ,res){
+  Item.findOne({name: req.params.vehicleTitle} , function (err , foundVehicle){
+    if(foundVehicle){
+      res.send(foundVehicle)
+    } else {
+      res.send("No Vehicle Maching that Name was found.");
+    }
+  });
+})
+
+.put(function (req , res ){
+Item.update(
+  // search for new Vehicle Name
+  {name: req.params.vehicleTitle},
+  {name : req.body.name, price: req.body.price},
+{overwrite: true},
+function (err){
+  if(!err){
+    res.send("Successfully updated Vehicle.");
+  }
+}
+);
+})
+// update a particular vehicle only provided data
+
+.patch(function (req , res){
+Item.update(
+{name: req.params.vehilceTitle},
+{$set: req.body},
+function (err){
+if(!err)
+{
+  res.send("Successfully updated article.")
+
+} else
+{
+  res.send(err);
+}
+
+}
+);
 
 });
 
